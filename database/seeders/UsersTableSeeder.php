@@ -73,5 +73,55 @@ class UsersTableSeeder extends Seeder
             'role_id' => $roleGRH->id,
             'service_id' => $serviceComptabilite->id,
         ]);
+
+
+
+
+        // Ajouter des employés au service de Mohamed (Bibliothèque)
+        $employeesBibliotheque = [
+            [
+                'matricule' => 'EMP002',
+                'nom' => 'Sanou',
+                'prenom' => 'Aminata',
+                'email' => 'aminata.sanou@gmail.com',
+                'fonction' => 'Assistante bibliothécaire',
+                'telephone' => '0678901234',
+                'date_de_prise_de_service' => '2023-04-10',
+            ],
+            [
+                'matricule' => 'EMP003',
+                'nom' => 'Zongo',
+                'prenom' => 'Issouf',
+                'email' => 'issouf.zongo@gmail.com',
+                'fonction' => 'Archiviste',
+                'telephone' => '0789012345',
+                'date_de_prise_de_service' => '2022-11-20',
+            ],
+            [
+                'matricule' => 'EMP004',
+                'nom' => 'Sawadogo',
+                'prenom' => 'Fatima',
+                'email' => 'fatima.sawadogo@gmail.com',
+                'fonction' => 'Technicienne documentaliste',
+                'telephone' => '0567890123',
+                'date_de_prise_de_service' => '2024-02-01',
+            ],
+        ];
+
+    foreach ($employeesBibliotheque as $employee) {
+        User::create([
+            'matricule' => $employee['matricule'],
+            'nom' => $employee['nom'],
+            'prenom' => $employee['prenom'],
+            'email' => $employee['email'],
+            'fonction' => $employee['fonction'],
+            'telephone' => $employee['telephone'],
+            'date_de_prise_de_service' => $employee['date_de_prise_de_service'],
+            'password' => Hash::make('passe1234'),
+            'role_id' => $roleEmploye->id,
+            'service_id' => $serviceBibliotheque->id,
+        ]);
     }
+
+}
 }

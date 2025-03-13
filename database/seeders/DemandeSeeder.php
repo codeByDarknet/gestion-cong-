@@ -37,6 +37,50 @@ class DemandeSeeder extends Seeder
             'motif' => 'Vacances annuelles',
             'statut' => 'Demandée',
         ]);
+        Demande::create([
+            'user_id' => $employe->id,
+            'type_demande_id' => $typeCongePaye->id,
+            'date_debut' => '2024-06-10',
+            'date_fin' => '2024-06-20',
+            'motif' => 'Repos annuels',
+            'statut' => 'Plannifiée',
+        ]);
+        Demande::create([
+            'user_id' => $employe->id,
+            'type_demande_id' => $typePaternite->id,
+            'date_debut' => '2024-07-15',
+            'date_fin' => '2024-07-30',
+            'motif' => 'Naissance de mon enfant',
+            'statut' => 'Plannifiée',
+        ]);
+        Demande::create([
+            'user_id' => $employe->id,
+            'type_demande_id' => $typeCongePaye->id,
+            'date_debut' => '2024-06-10',
+            'date_fin' => '2024-06-20',
+            'motif' => 'demande de conge',
+            'statut' => 'Demandée',
+        ]);
+
+        // demande de employé rejetee
+        Demande::create([
+            'user_id' => $employe->id,
+            'type_demande_id' => $typeCongePaye->id,
+            'date_debut' => '2024-06-10',
+            'date_fin' => '2024-06-20',
+            'motif' => 'demande de conge',
+            'statut' => 'Rejetée',
+        ]);
+
+        Demande::create([
+            'user_id' => $employe->id,
+            'type_demande_id' => $typeCongePaye->id,
+            'date_debut' => '2024-06-10',
+            'date_fin' => '2024-06-20',
+            'motif' => 'demande de conge',
+            'statut' => 'Acceptée',
+        ]);
+
 
         Demande::create([
             'user_id' => $responsable->id,

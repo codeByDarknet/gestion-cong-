@@ -1,124 +1,84 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .login-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        .login-container h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #666;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .form-group input:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-        .btn {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .btn:hover {
-            background-color: #0056b3;
-        }
-        .error {
-            color: red;
-            font-size: 0.8em;
-            margin-top: 5px;
-        }
-        .remember-forgot {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-        .remember-forgot a {
-            color: #007bff;
-            text-decoration: none;
-        }
-    </style>
+    <title>IBAM - Connexion</title>
+    <!-- Fonts and icons -->
+    <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link id="pagestyle" href="{{ asset('css/soft-ui-dashboard.css?v=1.1.0') }}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
-<body>
-    <div class="login-container">
-        <h2>Connexion</h2>
+
+<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
+    <div class="card shadow-lg p-4 w-100" style="max-width: 400px;">
+        <div class="text-center ">
+            <img src="{{ asset('img/logo_ibam.png') }}" alt="IBAM Logo" class="mb-3" style="max-width: 100px;">
+            <h3 class="fw-bold">Gestion des Congés et Absences</h3>
+            <p class="text-muted">Connectez-vous à votre compte</p>
+        </div>
+
+        @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0 ps-3">
+                @foreach ($errors->all() as $error)
+                <li style="list-style: none; color: white">{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <form action="{{ route('connexion') }}" method="POST">
             @csrf
-
-            @if ($errors->any())
-                <div class="error">
-                    @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
-                    @endforeach
+            <div class="mb-3">
+                <label for="email" class="form-label">Adresse email</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="exemple@ibam.org"
+                        value="{{ old('email') }}" required autofocus>
                 </div>
-            @endif
-
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    value="{{ old('email') }}"
-                    required
-                    autofocus
-                >
             </div>
 
-            <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    required
-                >
+            <div class="mb-3">
+                <label for="password" class="form-label">Mot de passe</label>
+                <div class="input-group" style="height: 50px;">
+                    <span class="input-group-text d-flex align-items-center" style="height: 100%;"><i class="fas fa-lock"></i></span>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required style="height: 100%;">
+                    <span class="btn toggle-password d-flex align-items-center" type="button" style="height: 100%;">
+                        <i class="fas fa-eye-slash"></i>
+                    </span>
+                </div>
             </div>
 
-            <div class="remember-forgot">
-                <label>
-                    <input type="checkbox" name="remember">
-                    Se souvenir de moi
-                </label>
-                <a href="#">Mot de passe oublié ?</a>
-            </div>
 
-            <button type="submit" class="btn">Se connecter</button>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-sign-in-alt me-2"></i> Se connecter
+            </button>
+
+
         </form>
+        <div class="text-center mt-3">
+            <a href="/" class="text-decoration-none">
+                <i class="fas fa-arrow-left me-1"></i> Retour à l'accueil
+            </a>
+        </div>
     </div>
+
+
+
+    <script>
+        document.querySelector('.toggle-password').addEventListener('click', function () {
+            const passwordField = document.getElementById('password');
+            const icon = this.querySelector('i');
+            passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
+
 </html>

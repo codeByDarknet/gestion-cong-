@@ -29,9 +29,22 @@ class LoginController extends Controller
     {
         // Validation des credentials
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
+            'email' => 'required|email',
+            'password' => 'required'
+        ], [
+            'email.required' => 'L\'adresse e-mail est obligatoire.',
+            'email.email' => 'Veuillez entrer une adresse e-mail valide.',
+            'password.required' => 'Le mot de passe est obligatoire.'
         ]);
+
+
+
+        // Vérification des identifiants
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return back()->withErrors(['email' => 'Adresse e-mail ou mot de passe incorrect.']);
+        }
+
+
 
         // Tentative d'authentification
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
@@ -42,7 +55,7 @@ class LoginController extends Controller
             return $this->redirectBasedOnRole($request->user());
         }
 
-        // Gestion de l'échec de connexion
+        // Gestion de l'échec de connexion avec le message approprié identidifant ou mot de passe incorrect
         throw ValidationException::withMessages([
             'email' => __('auth.failed'),
         ]);
@@ -57,7 +70,7 @@ class LoginController extends Controller
     protected function redirectBasedOnRole($user)
     {
         return match($user->role->nom) {
-            'employé' => redirect()->route('employe.dashboard'),
+            'employé' => redirect()->route('employe.accueil'),
             'responsable' => redirect()->route('responsable.dashboard'),
             'GRH' => redirect()->route('grh.dashboard'),
             default => redirect()->route('home'),

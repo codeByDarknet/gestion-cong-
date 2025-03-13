@@ -1,10 +1,10 @@
-@extends('grh.dashboard')
+@extends('grh.sidebar')
 
-@section('title', 'Liste des demandes')
+@section('title', 'Liste des employés')
 
 @section('content')
 <div class="container-fluid py-4">
-    <h2>Employé</h2>
+
     <div class="row">
         <div class="col-12">
             <div class="card mb-4">
@@ -20,8 +20,7 @@
                             {{-- ici je veux que la recherche se face avec du javascript  --}}
                             <form>
                                 <div class="input-group">
-                                    <input type="text" name="search" class="form-control form-control-outline" placeholder="Rechercher...">
-
+                                    <input type="text" id="searchInput" class="form-control form-control-outline" placeholder="Rechercher...">
                                 </div>
                             </form>
                         </div>
@@ -31,19 +30,19 @@
 
                 <div class="card-body px-0 pt-0 pb-2">
                     <div class="table-responsive p-0">
-                        <table class="table align-items-center mb-0">
+                        <table id="employesTable" class="table align-items-center mb-0">
                             <thead>
                                 <tr>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Matricule</th>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Nom & Prénom(s)</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fonction et Services</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Prise de Service</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Statut</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Telephone</th>
                                     <th class="text-secondary opacity-7">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($employes as $employe)
+                                @foreach ($employes->reverse() as $employe)
                                 <tr>
                                     <td class="align-middle text-center text-sm font-weight-bold">{{ $employe->matricule }}</td>
                                     <td class="align-middle text-center">
@@ -63,38 +62,123 @@
                                         <span class="text-xs text-muted">{{ $employe->service->nom }}</span>
                                     </td>
                                     <td class="align-middle text-center text-sm font-weight-bold">{{ $employe->date_de_prise_de_service }}</td>
-                                    <td class="align-middle text-center">
-                                        @php
-                                            $statusClass = match($employe->statut) {
-                                                'Actif' => 'badge bg-success',
-                                                'En congé' => 'badge bg-warning',
-                                                'Suspendu' => 'badge bg-danger',
-                                                default => 'badge bg-info'
-                                            };
-                                        @endphp
-                                        <span class="{{ $statusClass }}">{{ $employe->statut }}</span>
-                                    </td>
+
+                                    <td class="align-middle text-center ">{{ $employe->telephone }}</td>
+
                                     <td class="align-middle">
                                         <div class="dropdown">
-                                            <button class="btn btn-link text-secondary mb-0 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+
+                                            <button type="button" class="btn btn-primary " data-bs-toggle="modal"
+                                                data-bs-target="#modifEmploye{{ $employe->id }}">
                                                 <i class="fa fa-ellipsis-v text-xs"></i>
                                             </button>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a class="dropdown-item" href="#">
-                                                        <i class="fas fa-eye text-info me-2"></i> Voir
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <form action="#" method="POST" class="d-inline">
-                                                        @csrf
-                                                        <button type="submit" class="dropdown-item">
-                                                            <i class="fas fa-edit text-success me-2"></i> Modifier
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
+
+                                            <div class="modal fade" id="modifEmploye{{ $employe->id }}"
+                                                tabindex="-1"
+                                                aria-labelledby="modifEmploye{{ $employe->id }}Label"
+                                                aria-hidden="true">
+                                                <div class="modal-dialog modal-lg">
+
+                                                    <div class="modal-content">
+                                                        <div class="modal-header m-0">
+                                                            <h5 class="modal-title" id="modifEmploye{{ $employe->id }}Label">
+                                                                Modifier l'employé {{ $employe->matricule }}
+                                                            </h5>
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">
+                                                                <i class="fa fa-close"></i>
+                                                            </button>
+                                                        </div>
+
+                                                        <div class="modal-body p-4 py-0">
+                                                            {{-- Le formulaire de modification --}}
+                                                            <form action="{{ route('employes.modifier', $employe->id) }}" method="POST" id="editEmployeeForm">
+                                                                @csrf
+                                                                @method('PUT')
+
+                                                                <div class="modal-body">
+                                                                    <div class="row g-3 row-cols-md-2">
+                                                                        <!-- Matricule (non modifiable) -->
+                                                                        <div class="col">
+                                                                            <label class="form-label"><i class="fas fa-id-badge"></i> Matricule</label>
+                                                                            <input type="text" name="matricule" class="form-control" value="{{ $employe->matricule }}" readonly>
+                                                                        </div>
+
+                                                                        <!-- Nom -->
+                                                                        <div class="col">
+                                                                            <label class="form-label"><i class="fas fa-user"></i> Nom</label>
+                                                                            <input type="text" name="nom" class="form-control" value="{{ $employe->nom }}" required>
+                                                                        </div>
+
+                                                                        <!-- Prénom -->
+                                                                        <div class="col">
+                                                                            <label class="form-label"><i class="fas fa-user"></i> Prénom</label>
+                                                                            <input type="text" name="prenom" class="form-control" value="{{ $employe->prenom }}" required>
+                                                                        </div>
+
+                                                                        <!-- Email (non modifiable) -->
+                                                                        <div class="col">
+                                                                            <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                                                                            <input type="email" name="email" class="form-control" value="{{ $employe->email }}" readonly>
+                                                                        </div>
+
+                                                                        <!-- Téléphone -->
+                                                                        <div class="col">
+                                                                            <label class="form-label"><i class="fas fa-phone"></i> Téléphone</label>
+                                                                            <input type="tel" name="telephone" class="form-control" value="{{ $employe->telephone }}" required>
+                                                                        </div>
+
+                                                                        <!-- Date de prise de service -->
+                                                                        <div class="col">
+                                                                            <label class="form-label"><i class="fas fa-calendar"></i> Date de prise de service</label>
+                                                                            <input type="date" name="date_de_prise_de_service" class="form-control" value="{{ $employe->date_de_prise_de_service }}">
+                                                                        </div>
+
+                                                                        <!-- Service -->
+                                                                        <div class="col">
+                                                                            <label class="form-label"><i class="fas fa-building"></i> Service</label>
+                                                                            <select name="service_id" class="form-select" required>
+                                                                                <option value="">Sélectionner...</option>
+                                                                                @foreach($services as $service)
+                                                                                    <option value="{{ $service->id }}" @if ($employe->service_id == $service->id) selected @endif>{{ $service->nom }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
+
+                                                                        <!-- Fonction -->
+                                                                        <div class="col">
+                                                                            <label class="form-label"><i class="fas fa-briefcase"></i> Fonction</label>
+                                                                            <input type="text" name="fonction" class="form-control" value="{{ $employe->fonction }}" required>
+                                                                        </div>
+
+                                                                        <!-- Rôle -->
+                                                                        <div class="col">
+                                                                            <label class="form-label"><i class="fas fa-user-tag"></i> Rôle</label>
+                                                                            <select name="role_id" class="form-select" required>
+                                                                                <option value="">Sélectionner...</option>
+                                                                                @foreach($roles as $role)
+                                                                                    <option value="{{ $role->id }}" @if ($employe->role_id == $role->id) selected @endif>{{ $role->nom }}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="modal-footer d-flex justify-content-between">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Annuler</button>
+                                                                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
+                                                                </div>
+                                                            </form>
+
+
+
+                                                        </div>
+                                                    </div>
+
+
+                                                </div>
+
+
+                                            </div>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -118,51 +202,39 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addEmployeeModalLabel">Ajouter un employé</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close"> <i class="fa fa-close"></i></button>
             </div>
             <form action="{{ route('employes.ajouter') }}" method="POST" id="addEmployeeForm">
                 @csrf
                 <div class="modal-body">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Matricule</label>
-                            <input type="text" name="matricule" class="form-control" required>
+                    <div class="row g-3 row-cols-md-2">
+                        <div class="col">
+                            <label class="form-label"><i class="fas fa-id-badge"></i> Matricule</label>
+                            <input type="text" name="matricule" class="form-control" placeholder="Ex: EMP12345" required>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Nom</label>
-                            <input type="text" name="nom" class="form-control" required>
+                        <div class="col">
+                            <label class="form-label"><i class="fas fa-user"></i> Nom</label>
+                            <input type="text" name="nom" class="form-control" placeholder="Ex: Dupont" required>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Prénom</label>
-                            <input type="text" name="prenom" class="form-control" required>
+                        <div class="col">
+                            <label class="form-label"><i class="fas fa-user"></i> Prénom</label>
+                            <input type="text" name="prenom" class="form-control" placeholder="Ex: Jean" required>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" required>
+                        <div class="col">
+                            <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" name="email" class="form-control" placeholder="Ex: exemple@email.com" required>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Téléphone</label>
-                            <input type="tel" name="telephone" class="form-control" required>
+                        <div class="col">
+                            <label class="form-label"><i class="fas fa-phone"></i> Téléphone</label>
+                            <input type="tel" name="telephone" class="form-control" placeholder="Ex: +226 70 00 00 00" required>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Fonction</label>
-                            <input type="text" name="fonction" class="form-control">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Date de prise de service</label>
+
+                        <div class="col">
+                            <label class="form-label"><i class="fas fa-calendar"></i> Date de prise de service</label>
                             <input type="date" name="date_de_prise_de_service" class="form-control">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Rôle</label>
-                            <select name="role_id" class="form-select" required>
-                                <option value="">Sélectionner...</option>
-                                @foreach($roles as $role)
-                                    <option value="{{ $role->id }}">{{ $role->nom }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Service</label>
+                        <div class="col">
+                            <label class="form-label"><i class="fas fa-building"></i> Service</label>
                             <select name="service_id" class="form-select" required>
                                 <option value="">Sélectionner...</option>
                                 @foreach($services as $service)
@@ -170,57 +242,56 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Mot de passe</label>
-                            <input type="password" name="password" class="form-control" required>
+                        <div class="col">
+                            <label class="form-label"><i class="fas fa-briefcase"></i> Fonction</label>
+                            <input type="text" name="fonction" class="form-control" placeholder="Ex: Développeur" required>
                         </div>
+                        <div class="col">
+                            <label class="form-label"><i class="fas fa-user-tag"></i> Rôle</label>
+                            <select name="role_id" class="form-select" required>
+                                <option value="">Sélectionner...</option>
+                                @foreach($roles as $role)
+                                    <option value="{{ $role->id }}">{{ $role->nom }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Annuler</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer</button>
                 </div>
             </form>
+
         </div>
     </div>
 </div>
 
 
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function () {
-        $("#addEmployeeForm").submit(function (event) {
-            event.preventDefault(); // Empêche la soumission par défaut
+    // Fonction de filtrage
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#employesTable tbody tr');
 
-            let form = $(this);
-            let formData = form.serialize(); // Sérialise les données du formulaire
+        rows.forEach(row => {
+            const columns = row.querySelectorAll('td');
+            const matricule = columns[0].textContent.toLowerCase(); // Matricule
+            const nomPrenom = columns[1].textContent.toLowerCase(); // Nom & Prénom(s)
+            const fonctionService = columns[2].textContent.toLowerCase(); // Fonction et Services
+            const priseService = columns[3].textContent.toLowerCase(); // Prise de Service
+            const telephone = columns[4].textContent.toLowerCase(); // Téléphone
 
-            $.ajax({
-                url: form.attr("action"),
-                type: "POST",
-                data: formData,
-                dataType: "json",
-                success: function (response) {
-                    alert("Employé ajouté avec succès !");
-                    $("#addEmployeeModal").modal("hide"); // Ferme le modal
-                    form[0].reset(); // Réinitialise le formulaire
-                },
-                error: function (xhr) {
-                    let errors = xhr.responseJSON.errors;
-                    let errorMessage = "Erreur lors de l'enregistrement :\n";
-
-                    $.each(errors, function (key, value) {
-                        errorMessage += "- " + value[0] + "\n";
-                    });
-
-                    alert(errorMessage);
-                }
-            });
+            // Si le terme de recherche correspond à l'une des colonnes, afficher la ligne
+            if (matricule.includes(searchTerm) || nomPrenom.includes(searchTerm) || fonctionService.includes(searchTerm) || priseService.includes(searchTerm) || telephone.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
         });
     });
 </script>
-
 
 
 @endsection

@@ -14,6 +14,10 @@ class Demande extends Model
         'date_fin',
         'motif',
         'statut',
+        'piece_jointe',
+        'commentaire_modification',
+        'modication_urgente',
+        'relancer',
     ];
 
     public function user()
